@@ -1,0 +1,141 @@
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": 22,
+   "id": "1823a5e2-cd7f-444f-92f9-88a2adb1c04e",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Очищенный CSV содержит 4963691 строк.\n"
+     ]
+    }
+   ],
+   "source": [
+    "import pandas as pd\n",
+    "\n",
+    "df = pd.read_csv(\"US_Accidents_March23.csv\")\n",
+    "\n",
+    "df['Start_Time'] = pd.to_datetime(df['Start_Time'], errors='coerce')\n",
+    "\n",
+    "df = df.dropna(subset=['Start_Time'])\n",
+    "\n",
+    "df['Year'] = df['Start_Time'].dt.year\n",
+    "df = df[df['Year'].between(2019, 2023)]\n",
+    "\n",
+    "df.to_csv(\"US_Accidents_2019_2023_cleaned.csv\", index=False)\n",
+    "\n",
+    "print(f\"Очищенный CSV содержит {len(df)} строк.\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 24,
+   "id": "481609b7-74c9-4609-9bf8-693f97a0ba9e",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Year\n",
+      "2019     954302\n",
+      "2020    1161598\n",
+      "2021    1412433\n",
+      "2022    1268806\n",
+      "2023     166552\n",
+      "Name: count, dtype: int64\n"
+     ]
+    }
+   ],
+   "source": [
+    "import pandas as pd\n",
+    "\n",
+    "df = pd.read_csv(\"US_Accidents_2019_2023_cleaned.csv\")\n",
+    "\n",
+    "df['Start_Time'] = pd.to_datetime(df['Start_Time'], errors='coerce')\n",
+    "\n",
+    "df['Year'] = df['Start_Time'].dt.year\n",
+    "\n",
+    "counts_per_year = df['Year'].value_counts().sort_index()\n",
+    "\n",
+    "print(counts_per_year)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 40,
+   "id": "e05190fc-71fb-43ab-b2f0-05343eb38743",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Файл сохранён: US_Accidents_2019_2023_final.csv\n",
+      "Всего строк: 20000\n"
+     ]
+    }
+   ],
+   "source": [
+    "import pandas as pd\n",
+    "\n",
+    "df = pd.read_csv(\"US_Accidents_2019_2023_cleaned.csv\")\n",
+    "\n",
+    "df['Start_Time'] = pd.to_datetime(df['Start_Time'], errors='coerce')\n",
+    "\n",
+    "df = df.dropna(subset=['Start_Time'])\n",
+    "\n",
+    "df['Year'] = df['Start_Time'].dt.year\n",
+    "df = df[df['Year'].between(2019, 2023)]\n",
+    "\n",
+    "years = [2019, 2020, 2021, 2022, 2023]\n",
+    "samples = []\n",
+    "\n",
+    "for year in years:\n",
+    "    year_data = df[df['Year'] == year]\n",
+    "    sample = year_data.sample(n=4000, random_state=42)\n",
+    "    samples.append(sample)\n",
+    "\n",
+    "result_df = pd.concat(samples)\n",
+    "\n",
+    "columns_to_keep = [\n",
+    "    'ID', 'City', 'State', 'Start_Time', 'Severity',\n",
+    "    'Start_Lat', 'Start_Lng',\n",
+    "    'Weather_Condition', 'Temperature(F)', 'Precipitation(in)',\n",
+    "    'Visibility(mi)', 'Humidity(%)', 'Distance(mi)'\n",
+    "]\n",
+    "result_df = result_df[columns_to_keep]\n",
+    "\n",
+    "result_df.to_csv(\"US_Accidents_2019_2023_final(2).csv\", index=False)\n",
+    "\n",
+    "print(f\"Файл сохранён: US_Accidents_2019_2023_final.csv\")\n",
+    "print(f\"Всего строк: {len(result_df)}\")"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python [conda env:base] *",
+   "language": "python",
+   "name": "conda-base-py"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.12.7"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
